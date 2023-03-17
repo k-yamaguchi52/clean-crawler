@@ -29,8 +29,12 @@ public class URLScraper {
     public void scrapeNewUrlsAndSendFetchRequestQueue(FetchResponse fetchResponse) {
         List<String> extractedLinks = urlExtractor.extractLink(fetchResponse);
         List<String> newLinks = urlLoader.filterNewLinks(extractedLinks);
-        newLinks.forEach(newLink -> {
-                    rabbitTemplate.convertAndSend(fetchRequestQueue, new FetchRequest(newLink));
+        sendFetchRequestQueues(newLinks);
+    }
+
+    private void sendFetchRequestQueues(List<String> links) {
+        links.forEach(link -> {
+                    rabbitTemplate.convertAndSend(fetchRequestQueue, new FetchRequest(link));
                 }
         );
     }

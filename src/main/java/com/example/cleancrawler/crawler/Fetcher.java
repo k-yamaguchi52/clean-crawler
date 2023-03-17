@@ -33,14 +33,18 @@ public class Fetcher {
     @RabbitListener(queues = "${rabbitmq.queue.fetch_request}")
     public void fetchHtmlAndSendResponseQueue(FetchRequest request) {
         FetchResponse response = fetch(request.url);
-        rabbitTemplate.convertAndSend(FETCH_RESPONSE_QUEUE, response);
+        sendFetchResponseQueues(response);
     }
 
-    public FetchResponse fetch(String url) {
+    private FetchResponse fetch(String url) {
         String html = fetchHtmlFromUrl(url);
         Path path = createPath(url);
         saveHtmlFile(path, html);
         return new FetchResponse(path.toString(), url);
+    }
+
+    private void sendFetchResponseQueues(FetchResponse fetchResponse) {
+        rabbitTemplate.convertAndSend(FETCH_RESPONSE_QUEUE, fetchResponse);
     }
 
     private String fetchHtmlFromUrl(String url) {
@@ -52,21 +56,21 @@ public class Fetcher {
         }
     }
 
-    private void saveHtmlFile(Path path, String html) {
-        try {
-            FileUtil.createRecursiveDirs(path.getParent().toString());
-            Files.writeString(path, html);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new CrawlerException(e.getMessage());
-        }
-    }
-
     private Path createPath(String urlStr) {
         try {
             URL url = new URL(urlStr);
             return Paths.get(HTML_SAVED_DIR + url.getPath() + "/index.html");
         } catch (MalformedURLException e) {
+            e.printStackTrace();
+            throw new CrawlerException(e.getMessage());
+        }
+    }
+
+    private void saveHtmlFile(Path path, String html) {
+        try {
+            FileUtil.createRecursiveDirs(path.getParent().toString());
+            Files.writeString(path, html);
+        } catch (IOException e) {
             e.printStackTrace();
             throw new CrawlerException(e.getMessage());
         }
