@@ -9,8 +9,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 
-import java.net.URISyntaxException;
-
 @ComponentScan
 @EnableAutoConfiguration
 @EnableConfigurationProperties
@@ -29,7 +27,7 @@ public class CrawlerApplication implements CommandLineRunner {
     }
 
     @Override
-    public void run(String...args) throws URISyntaxException {
+    public void run(String...args) {
         System.out.println("Sending message...");
         rabbitTemplate.convertAndSend(FETCH_REQUEST_QUEUE, new FetchRequest(seedUrl));
     }
