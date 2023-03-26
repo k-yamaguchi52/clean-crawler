@@ -16,11 +16,6 @@ public class FileUtil {
         File file = new File(path);
         if (!file.exists()) {
             file.mkdirs();
-//            if (file.mkdirs()) {
-//                System.out.println("created!");
-//            } else {
-//                System.out.println("failed to create dir");
-//            }
         }
     }
 }
